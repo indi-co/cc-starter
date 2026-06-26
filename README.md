@@ -79,9 +79,35 @@ claude
 ```
 
 ### 2. 연동 도구 설치 (필요한 것만 — Claude에게 시키면 됨)
-- **PLAUD CLI** (통화 녹취 — 페르소나 핵심): `npm i -g @plaud-ai/cli` → `plaud login`
-- (선택) **Notion / Slack / gws CLI** — 이후 업무 자동화용
-> 페르소나 생성에 최소로 필요한 건 **PLAUD (+선택 Notion)**.
+
+**PLAUD (통화 녹취 — 페르소나 핵심) = CLI**
+```bash
+npm i -g @plaud-ai/cli && plaud login
+```
+
+**Notion · Slack = MCP** (대화 중 읽고/쓰기 → MCP가 적합. 개인 토큰(PAT) 기반 권장 — 데이터 통제·권한 범위를 내가 쥔다)
+
+> ⚠️ **토큰을 repo에 커밋하지 말 것.** 아래 `claude mcp add`는 기본 `local` 스코프(내 PC 설정에만 저장, repo 미포함)로 들어간다. 프로젝트 공유용 `.mcp.json`을 쓸 땐 토큰을 직접 넣지 말고 환경변수 참조만.
+
+**Notion**
+1. <https://www.notion.so/my-integrations> 에서 internal integration 생성 → 토큰(`ntn_...`) 복사
+2. 봇이 읽을 페이지/DB를 그 integration에 **공유**(Connections 추가)
+3. 등록:
+```bash
+claude mcp add notion -e NOTION_TOKEN=ntn_xxx -- npx -y @notionhq/notion-mcp-server
+```
+
+**Slack**
+1. <https://api.slack.com/apps> 에서 앱 생성 → Bot Token Scopes 부여(`channels:read`, `channels:history`, `chat:write` 등) → 워크스페이스에 Install → Bot 토큰(`xoxb-...`) + Team ID(`T...`) 확보
+2. 등록:
+```bash
+claude mcp add slack -e SLACK_BOT_TOKEN=xoxb-xxx -e SLACK_TEAM_ID=Txxx -- npx -y @modelcontextprotocol/server-slack
+```
+
+> 패키지명·환경변수명은 각 MCP 서버 README에서 최신 버전 확인. 등록 후 Claude Code에서 **`/mcp`**로 연결 상태 확인.
+> (claude.ai OAuth 커넥터로도 붙일 수 있지만, 사업·고객 데이터는 토큰을 내가 쥐는 PAT 방식을 권장.)
+
+> 페르소나 생성에 최소로 필요한 건 **PLAUD (+선택 Notion)**. Slack·gws는 이후 업무 자동화용.
 
 ### 3. 페르소나 생성
 ```
